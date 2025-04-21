@@ -8,45 +8,7 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 from scipy.ndimage import uniform_filter
-
-def gaussian_notch_filter(shape, d0=10, u_k=0, v_k=0):
-    P, Q = shape
-    H = np.ones((P, Q), dtype=np.float32)
-
-    for u in range(P):
-        for v in range(Q):
-            D_uv = np.sqrt((u - P/2 + u_k)**2 + (v - Q/2 + v_k)**2)
-            D_muv = np.sqrt((u - P/2 - u_k)**2 + (v - Q/2 - v_k)**2)
-
-            H[u, v] = 1 - np.exp(-0.5 * ((D_uv * D_muv) / (d0**2)) )
-
-    return H
-
-def ideal_notch_filter(shape, d0=10, u_k=0, v_k=0):
-    P, Q = shape
-    H = np.ones((P, Q), dtype=np.float32)
-
-    for u in range(P):
-        for v in range(Q):
-            D_uv = np.sqrt((u - P/2 + u_k)**2 + (v - Q/2 + v_k)**2)
-            D_muv = np.sqrt((u - P/2 - u_k)**2 + (v - Q/2 - v_k)**2)
-
-            if D_uv <= d0 or D_muv <= d0:
-                H[u, v] = 0
-    return H
-
-def butterworth_notch_filter(shape, d0=10, u_k=0, v_k=0, n=2):
-    P, Q = shape
-    H = np.ones((P, Q), dtype=np.float32)
-
-    for u in range(P):
-        for v in range(Q):
-            D_uv = np.sqrt((u - P/2 + u_k)**2 + (v - Q/2 + v_k)**2)
-            D_muv = np.sqrt((u - P/2 - u_k)**2 + (v - Q/2 - v_k)**2)
-
-            H[u, v] = 1 / (1 + (d0**2 / (D_uv * D_muv))**n)
-    return H
-
+from filters.notch_filters import IdealNotchFilter, ButterworthNotchFilter, GaussianNotchFilter
 
 def calculate_w(g, eta, window_size=(20, 25)):
     a, b = window_size
@@ -73,12 +35,6 @@ class MainApp:
 
         # === Tạo 6 Frame chứa ảnh ===
         self.frames = []
-
-        
-        # for i in range(6):
-        #     frame = tk.LabelFrame(self.root, text=f"Cột {i+1}", bg="white")
-        #     frame.grid(row=0, column=i, sticky="nsew", padx=5, pady=5)
-        #     self.frames.append(frame)
 
         frame = tk.LabelFrame(self.root, text=f"Ảnh gốc g(x, y)", bg="white")
         frame.grid(row=0, column=0, sticky="nsew", padx=5, pady=5)
@@ -107,11 +63,6 @@ class MainApp:
         # === Chia đều 6 cột ===
         for i in range(6):
             self.root.grid_columnconfigure(i, weight=1)
-
-        # === Setup nội dung mẫu cho các frame ===
-        # for frame in self.frames:
-        #     label = tk.Label(frame, text="Hình ảnh ở đây", padx=80, pady=150)
-        #     label.pack(expand=True, fill=tk.BOTH)
 
         self.anh_goc = tk.Label(self.frames[0], text="Ảnh gốc g(x, y)\nở đây",  padx=80, pady=150)
         self.anh_goc.pack(expand=True, fill=tk.BOTH)
@@ -304,11 +255,11 @@ class MainApp:
                 u_shift = u_k - img_shape[0] // 2
                 v_shift = v_k - img_shape[1] // 2
                 if self.select_filter_var.get() == "Gaussian":
-                    notch = gaussian_notch_filter(img_shape, d0, u_shift, v_shift)
+                    notch = GaussianNotchFilter().apply_filter(img_shape, d0, u_shift, v_shift)
                 elif self.select_filter_var.get() == "Butterworth":
-                    notch = butterworth_notch_filter(img_shape, d0, u_shift, v_shift, n=2)
+                    notch = ButterworthNotchFilter().apply_filter(img_shape, d0, u_shift, v_shift, n=2)
                 elif self.select_filter_var.get() == "Ideal":
-                    notch = ideal_notch_filter(img_shape, d0, u_shift, v_shift)
+                    notch = IdealNotchFilter().apply_filter(img_shape, d0, u_shift, v_shift)
                 H_total *= notch
 
             G_shift = fshift
