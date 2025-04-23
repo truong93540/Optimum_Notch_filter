@@ -9,13 +9,13 @@ class IdealNotchFilter:
         pass
     
     def apply_filter(self, shape, d0=10, u_k=0, v_k=0):
-        P, Q = shape
-        H = np.ones((P, Q), dtype=np.float32)
+        M, N = shape
+        H = np.ones((M, N), dtype=np.float32)
 
-        for u in range(P):
-            for v in range(Q):
-                D_uv = np.sqrt((u - P/2 + u_k)**2 + (v - Q/2 + v_k)**2)
-                D_muv = np.sqrt((u - P/2 - u_k)**2 + (v - Q/2 - v_k)**2)
+        for u in range(M):
+            for v in range(N):
+                D_uv = np.sqrt((u - M/2 + u_k)**2 + (v - N/2 + v_k)**2)
+                D_muv = np.sqrt((u - M/2 - u_k)**2 + (v - N/2 - v_k)**2)
 
                 if D_uv <= d0 or D_muv <= d0:
                     H[u, v] = 0
@@ -26,13 +26,13 @@ class ButterworthNotchFilter:
         pass
     
     def apply_filter(self, shape, d0=10, u_k=0, v_k=0, n=2):
-        P, Q = shape
-        H = np.ones((P, Q), dtype=np.float32)
+        M, N = shape
+        H = np.ones((M, N), dtype=np.float32)
 
-        for u in range(P):
-            for v in range(Q):
-                D_uv = np.sqrt((u - P/2 + u_k)**2 + (v - Q/2 + v_k)**2)
-                D_muv = np.sqrt((u - P/2 - u_k)**2 + (v - Q/2 - v_k)**2)
+        for u in range(M):
+            for v in range(N):
+                D_uv = np.sqrt((u - M/2 + u_k)**2 + (v - N/2 + v_k)**2)
+                D_muv = np.sqrt((u - M/2 - u_k)**2 + (v - N/2 - v_k)**2)
 
                 H[u, v] = (1 / (1 + (d0 / D_muv)**(2 * n))) * (1 / (1 + (d0 / D_uv)**(2 * n)))
 
@@ -43,13 +43,13 @@ class GaussianNotchFilter:
         pass
     
     def apply_filter(self, shape, d0=10, u_k=0, v_k=0):
-        P, Q = shape
-        H = np.ones((P, Q), dtype=np.float32)
+        M, N = shape
+        H = np.ones((M, N), dtype=np.float32)
 
-        for u in range(P):
-            for v in range(Q):
-                D_uv = np.sqrt((u - P/2 + u_k)**2 + (v - Q/2 + v_k)**2)
-                D_muv = np.sqrt((u - P/2 - u_k)**2 + (v - Q/2 - v_k)**2)
+        for u in range(M):
+            for v in range(N):
+                D_uv = np.sqrt((u - M/2 + u_k)**2 + (v - N/2 + v_k)**2)
+                D_muv = np.sqrt((u - M/2 - u_k)**2 + (v - N/2 - v_k)**2)
 
                 H[u, v] = (1 - np.exp(-(D_uv**2) / (2 * d0**2))) * (1 - np.exp(-(D_muv**2) / (2 * d0**2)))
 
