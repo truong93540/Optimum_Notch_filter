@@ -103,17 +103,6 @@ class MainApp:
 
         filter_frame.grid_columnconfigure(1, weight=1)
 
-        # Số điểm
-        points_frame = tk.Frame(self.control_frame, bg="lightgray")
-        points_frame.pack(padx=600, fill=tk.X)
-
-        tk.Label(points_frame, text="Số điểm:", bg="lightgray").grid(row=0, column=0, sticky='w', padx=5)
-        self.number_of_points = tk.Entry(points_frame, justify='center', font=('Arial', 12))
-        self.number_of_points.grid(row=0, column=1, sticky='ew', padx=5)
-        self.number_of_points.insert(tk.END, '1')
-
-        points_frame.grid_columnconfigure(1, weight=1)
-
         # Bán kính
         radius_frame = tk.Frame(self.control_frame, bg="lightgray")
         radius_frame.pack(padx=600, pady=5, fill=tk.X)
@@ -121,7 +110,7 @@ class MainApp:
         tk.Label(radius_frame, text="Bán kính:", bg="lightgray").grid(row=0, column=0, sticky='w', padx=5)
         self.frequency = tk.Entry(radius_frame, justify='center', font=('Arial', 12))
         self.frequency.grid(row=0, column=1, sticky='ew', padx=5)
-        self.frequency.insert(tk.END, '10')
+        self.frequency.insert(tk.END, '5')
 
         radius_frame.grid_columnconfigure(1, weight=1)
 
@@ -228,9 +217,9 @@ class MainApp:
         plt.imshow(Image.open(pathlib.Path("tmp/pho_anh.png")), cmap="gray")
         self.set_plot_title("Nhấp vào hình ảnh để chọn điểm. (Nhấn phím bất kỳ để bắt đầu)")
         plt.waitforbuttonpress()
-        self.set_plot_title(f"Click {self.number_of_points.get()} điểm bằng chuột")
-        clicked_points = np.asarray(plt.ginput(int(self.number_of_points.get()), timeout=-1))
-        print(clicked_points)
+        self.set_plot_title("Nhấp chuột chọn điểm (nhấn Enter để kết thúc)")
+        clicked_points = np.asarray(plt.ginput(n=-1, timeout=0))
+        # print(clicked_points)
         plt.close()
         for i in range(len(clicked_points)):
             clicked_points[i][0], clicked_points[i][1] = clicked_points[i][1], clicked_points[i][0]
@@ -273,7 +262,7 @@ class MainApp:
             w = calculate_w(img, eta, window_size=(20, 25))
 
             img = np.asarray(Image.open(pathlib.Path("tmp/anh_goc.png")))
-            print("w", w)
+            # print("w", w)
             img_restored = img - w * eta
 
             # --- Update các ảnh trên giao diện ---

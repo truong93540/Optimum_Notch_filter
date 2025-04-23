@@ -34,7 +34,8 @@ class ButterworthNotchFilter:
                 D_uv = np.sqrt((u - P/2 + u_k)**2 + (v - Q/2 + v_k)**2)
                 D_muv = np.sqrt((u - P/2 - u_k)**2 + (v - Q/2 - v_k)**2)
 
-                H[u, v] = 1 / (1 + (d0**2 / (D_uv * D_muv))**n)
+                H[u, v] = (1 / (1 + (d0 / D_muv)**(2 * n))) * (1 / (1 + (d0 / D_uv)**(2 * n)))
+
         return H
     
 class GaussianNotchFilter:
@@ -50,6 +51,6 @@ class GaussianNotchFilter:
                 D_uv = np.sqrt((u - P/2 + u_k)**2 + (v - Q/2 + v_k)**2)
                 D_muv = np.sqrt((u - P/2 - u_k)**2 + (v - Q/2 - v_k)**2)
 
-                H[u, v] = 1 - np.exp(-0.5 * ((D_uv * D_muv) / (d0**2)) )
+                H[u, v] = (1 - np.exp(-(D_uv**2) / (2 * d0**2))) * (1 - np.exp(-(D_muv**2) / (2 * d0**2)))
 
         return H
