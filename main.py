@@ -7,16 +7,16 @@ import matplotlib.image
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
-from scipy.ndimage import uniform_filter
 from filters.notch_filters import IdealNotchFilter, ButterworthNotchFilter, GaussianNotchFilter
+import cv2
 
 def calculate_w(g, eta, window_size=(20, 25)):
     a, b = window_size
 
-    mean_g = uniform_filter(g, size=(a, b))
-    mean_eta = uniform_filter(eta, size=(a, b))
-    mean_g_eta = uniform_filter(g * eta, size=(a, b))
-    mean_eta2 = uniform_filter(eta * eta, size=(a, b))
+    mean_g = cv2.blur(g, (window_size))
+    mean_eta = cv2.blur(eta, (window_size))
+    mean_g_eta = cv2.blur(g * eta, (window_size))
+    mean_eta2 = cv2.blur(eta * eta, (window_size))
 
     numerator = mean_g_eta - mean_g * mean_eta
     denominator = mean_eta2 - mean_eta**2
@@ -29,11 +29,10 @@ class MainApp:
     def __init__(self):
         windll.shcore.SetProcessDpiAwareness(1)
         self.root = tk.Tk()
-        # self.root.tk.call('tk', 'scaling', 1.5)
         self.root.resizable(True, True)
         self.root.title("Optimum Notch Filter")
 
-        # === Tạo 6 Frame chứa ảnh ===
+        # === Tạo 6 Frame chứa ảnh
         self.frames = []
 
         frame = tk.LabelFrame(self.root, text=f"Ảnh gốc g(x, y)", bg="white")
